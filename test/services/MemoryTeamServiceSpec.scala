@@ -61,7 +61,7 @@ class MemoryTeamServiceSpec extends PlaySpec {
       memoryTeamService.create(arsenal)
       memoryTeamService.create(chelsea)
       val result = memoryTeamService.update(Team(30L, "Lewes FC", Stadium("The Dripping Pan")))
-      result mustBe(Failure(new NoSuchElementException("Team is not in service")))
+      result mustBe a [Failure[_]]
     }
   }
 }
