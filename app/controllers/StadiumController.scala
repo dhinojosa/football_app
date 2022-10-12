@@ -12,9 +12,7 @@ import scala.util.hashing.MurmurHash3
 
 case class StadiumData(name: String, city: String, country: String, seats: Int)
 
-class StadiumController @Inject() (
-    val controllerComponents: ControllerComponents
-) extends BaseController {
+class StadiumController @Inject() (val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport {
   def list() = Action { implicit request =>
     val result = List(
       Stadium(10L, "Stamford Bridge", 1203, "A", "B"),

@@ -1,11 +1,13 @@
-@(stadiumForm: Form[StadiumData])
+@(stadiumForm: Form[StadiumData])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
+@import views.html.helper.CSRF
 
 @main("Create Stadium") {
-    <form id="create_stadium" action="/stadium" method="post">
-        <label for="name">Name:</label><input type="text" id="name" name="name" value="@stadiumForm("name").value"/>
-        <label for="city">City:</label><input type="text" id="city" name="city" value="@stadiumForm("city").value"/>
-        <label for="country">Country:</label><input type="text" id="country" name="country" value="@stadiumForm("country").value"/>
-        <label for="seats">Seats:</label><input type="text" id="seats" name="seats" value="@stadiumForm("seats").value"/>
+    @helper.form(action = routes.StadiumController.create()) {
+        @CSRF.formField
+        @helper.inputText(stadiumForm("name"))
+        @helper.inputText(stadiumForm("city"))
+        @helper.inputText(stadiumForm("country"))
+        @helper.inputText(stadiumForm("seats"))
         <input type="submit" id="submit" value="Submit"/>
-    </form>
+    }
 }
