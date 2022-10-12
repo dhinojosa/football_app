@@ -8,6 +8,10 @@ import play.api.data.Form
 import play.api.data.Forms.{mapping, number, text}
 import play.api.mvc._
 
+import scala.util.hashing.MurmurHash3
+
+case class StadiumData(name: String, city: String, country: String, seats: Int)
+
 class StadiumController @Inject() (
     val controllerComponents: ControllerComponents
 ) extends BaseController {
@@ -18,10 +22,8 @@ class StadiumController @Inject() (
       Stadium(13L, "Ashburton Grove", 2000, "A", "B"),
       Stadium(15L, "The Dripping Pan", 4000, "A", "B")
     )
-    Ok(views.html.stadiums(result))
+    Ok(views.html.stadium.stadiums(result))
   }
-
-  case class StadiumData(name:String, city:String, country:String, seats:Int)
 
   val stadiumForm = Form(
     mapping(
@@ -29,13 +31,36 @@ class StadiumController @Inject() (
       "city" -> text,
       "country" -> text,
       "seats" -> number
-    )(StadiumData.apply)//Construction
-       (StadiumData.unapply) //Destructuring
+    )(StadiumData.apply) //Construction
+    (StadiumData.unapply) //Destructuring
   )
 
-//  def init() = Action { implicit request =>
-//
-//
-//
-//  }
+  def init(): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.stadium.create(stadiumForm))
+  }
+
+  def create() = Action { implicit request =>
+    stadiumForm.bindFromRequest.fold(
+      formWithErrors => {
+        println("Nay!" + formWithErrors)
+        BadRequest(views.html.stadium.create(formWithErrors))
+      },
+      stadiumData => {
+        val id = MurmurHash3.stringHash(stadiumData.name)
+        val newUser = models.Stadium(
+          id,
+          stadiumData.name,
+          stadiumData.seats,
+          stadiumData.city,
+          stadiumData.country
+        )
+        println("Yay!" + newUser)
+        Redirect(routes.StadiumController.show(id))
+      }
+    )
+  }
+
+  def show(id: Long) = Action { implicit request =>
+    Ok("This is placeholder for this stadium")
+  }
 }

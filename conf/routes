@@ -4,16 +4,22 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                          controllers.HomeController.index()
+GET         /                            controllers.HomeController.index()
 
-GET     /introz/extreme/*name               controllers.HomeController.intro(name:String)
+GET         /introz/extreme/*name        controllers.HomeController.intro(name:String)
 
-GET     /find/$id<[0-9]+>        controllers.HomeController.findById(id:Long)
+GET         /find/$id<[0-9]+>            controllers.HomeController.findById(id:Long)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET     /scala-time              controllers.Default.redirect(to = "https://www.scala-lang.org")
+GET         /scala-time                  controllers.Default.redirect(to = "https://www.scala-lang.org")
 #\.[^(]*\(
 
-GET     /stadiums                controllers.StadiumController.list()
+GET         /stadiums                    controllers.StadiumController.list()
+
+GET         /stadium                     controllers.StadiumController.init()
+
+GET         /stadium/:id                 controllers.StadiumController.show(id:Long)
+
+POST        /stadium                     controllers.StadiumController.create()
