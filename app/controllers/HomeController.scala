@@ -22,4 +22,15 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     //I am going to do stuff
     Ok(views.html.index())
   }
+
+  def intro(name:String) = Action { implicit request =>
+      Ok(s"Hello, you have reached our hotline, you say you want the following?"
+          + name)
+  }
+
+  def findById(id:Long) = Action {implicit request =>
+    val result = if (id > 10) "Stuart"
+    else "Laura"
+    Redirect(routes.HomeController.intro(result))
+  }
 }

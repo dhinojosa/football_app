@@ -1,0 +1,9 @@
+@(stadiums: List[Stadium])
+
+<h1>Welcome, there are @stadiums.size stadiums to look at!</h1>
+
+<ul>
+@for(stadium <- stadiums) {
+    <li>@stadium.name</li>
+}
+</ul>

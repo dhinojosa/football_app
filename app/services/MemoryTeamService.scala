@@ -19,7 +19,7 @@ class MemoryTeamService extends TeamService {
   override def update(team: Team): Try[Team] = {
     Try(mutableList.find(t => t.id == team.id).head)
       .map(t => {
-        mutableList.filterInPlace(t => t.id != team.id).addOne(team); t
+        mutableList.filterInPlace(t => t.id != team.id).addOne(team); team
       })
   }
 
