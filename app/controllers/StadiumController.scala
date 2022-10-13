@@ -1,26 +1,24 @@
 package controllers;
 
-import models.Stadium
-
-import javax.inject._
-import play.api._
 import play.api.data.Form
 import play.api.data.Forms.{mapping, number, text}
 import play.api.mvc._
-import services.StadiumService
+import services.AsyncStadiumService
 
+import javax.inject._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.hashing.MurmurHash3
 
 case class StadiumData(name: String, city: String, country: String, seats: Int)
 
 class StadiumController @Inject() (
     val controllerComponents: ControllerComponents,
-    val stadiumService: StadiumService
+    val stadiumService: AsyncStadiumService
 ) extends BaseController
     with play.api.i18n.I18nSupport {
-  def list() = Action { implicit request =>
-    val result = stadiumService.findAll()
-    Ok(views.html.stadium.stadiums(result))
+  def list() = Action.async { implicit request =>
+    stadiumService.findAll().map(xs => Ok(views.html.stadium.stadiums(xs))
+    )
   }
 
   val stadiumForm = Form(
@@ -59,10 +57,14 @@ class StadiumController @Inject() (
     )
   }
 
-  def show(id: Long): Action[AnyContent] = Action.apply { implicit request =>
-    val maybeStadium = stadiumService.findById(id)
-    maybeStadium
-      .map(s => Ok(views.html.stadium.show(s)))
-      .getOrElse(NotFound("Sorry, that stadium is not found"))
+
+
+  def show(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    stadiumService
+      .findById(id)
+      .map {
+          case Some(stadium) => Ok(views.html.stadium.show(stadium))
+          case None => NotFound("Stadium not found")
+      }
   }
 }

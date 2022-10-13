@@ -4,6 +4,6 @@
 
 <ul>
 @for(stadium <- stadiums) {
-    <li>@stadium.name</li>
+    <li><a href="@routes.StadiumController.show(stadium.id)">@stadium.name</a></li>
 }
 </ul>

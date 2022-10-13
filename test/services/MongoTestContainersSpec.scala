@@ -14,12 +14,7 @@ class MongoTestContainersSpec extends PlaySpec with ForAllTestContainer {
   "MongoDBTeamService" must {
 
     "createATeamDocument" in {
-      println("Did this work?")
-//      val host = container.host
-//      val port = container.livenessCheckPortNumbers.head
-//      println(host)
-//      println(port)
-      val mongoClient: MongoClient = MongoClient("mongodb://aws-29190-us-west-390391991292193:" + 27017)
+      val mongoClient: MongoClient = MongoClient("mongodb://localhost:" + 27017)
       val myCompanyDatabase = mongoClient.getDatabase("my_company")
       val employeeCollection = myCompanyDatabase.getCollection("employees")
 
