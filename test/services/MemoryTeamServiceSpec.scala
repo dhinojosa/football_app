@@ -8,12 +8,7 @@ import scala.util.{Failure, Success}
 
 class MemoryTeamServiceSpec extends PlaySpec {
   "MemoryTeamService" must {
-    "return the size of the list after I create the team" in {
-      val memoryTeamService:TeamService = AlternateMemoryTeamService.apply
-      val team = Team(12L, "Arsenal", Stadium("Emirates Stadium"))
-      memoryTeamService.create(team)
-      memoryTeamService.findAll().size mustBe (1)
-    }
+
     "find a team by an id and return that team if it is in there" in {
       val memoryTeamService = new MemoryTeamService();
       val arsenal = Team(12L, "Arsenal", Stadium("Emirates Stadium"))
