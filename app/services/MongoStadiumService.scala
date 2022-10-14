@@ -8,13 +8,14 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import scala.util.Try
 
-/**
- * In this latest change I am injecting the collection rather creating it inside
- * of this particular service. Check the previous commit to see the difference
- *
- * @param stadiumCollection the MongoCollection that is established in Module
- */
-class MongoStadiumService @Inject() (stadiumCollection:MongoCollection[Document]) extends AsyncStadiumService {
+/** In this latest change I am injecting the collection rather creating it inside
+  * of this particular service. Check the previous commit to see the difference
+  *
+  * @param stadiumCollection the MongoCollection that is established in Module
+  */
+class MongoStadiumService @Inject() (
+    stadiumCollection: MongoCollection[Document]
+) extends AsyncStadiumService {
 
   override def findById(id: Long): Future[Option[Stadium]] = {
     stadiumCollection
@@ -26,15 +27,11 @@ class MongoStadiumService @Inject() (stadiumCollection:MongoCollection[Document]
       .headOption()
   }
 
-  override def create(stadium: Stadium) = {
-    val document: Document = stadiumToDocument(stadium)
-
+  override def create(stadium: Stadium) =
     stadiumCollection
-      .insertOne(document)
-        .map(r => r.getInsertedId.asInt64().longValue())
-        .head()
-
-  }
+      .insertOne(stadiumToDocument(stadium))
+      .map(r => r.getInsertedId.asInt64().longValue())
+      .head()
 
   private def stadiumToDocument(stadium: Stadium) = {
     Document(
