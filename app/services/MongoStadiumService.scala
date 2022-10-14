@@ -1,16 +1,8 @@
 package services
 
 import models.Stadium
-import org.mongodb.scala.connection.ClusterSettings
-import org.mongodb.scala.{
-  Document,
-  MongoClient,
-  MongoClientSettings,
-  MongoCredential,
-  ServerAddress,
-  SingleObservable
-}
 import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.{Document, MongoClient}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -33,16 +25,14 @@ class MongoStadiumService extends AsyncStadiumService {
       .headOption()
   }
 
-  override def create(stadium: Stadium): Unit = {
+  override def create(stadium: Stadium) = {
     val document: Document = stadiumToDocument(stadium)
 
     stadiumCollection
       .insertOne(document)
-      .subscribe(
-        r => println(s"Successful Insert $r"),
-        t => t.printStackTrace(),
-        () => "Insert Complete"
-      )
+        .map(r => r.getInsertedId.asInt64().longValue())
+        .head()
+
   }
 
   private def stadiumToDocument(stadium: Stadium) = {

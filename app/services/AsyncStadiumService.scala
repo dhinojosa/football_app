@@ -8,7 +8,7 @@ import scala.util.Try
 trait AsyncStadiumService {
     def findById(id: Long): Future[Option[Stadium]]
 
-    def create(stadium:Stadium): Unit
+    def create(stadium:Stadium): Future[Long]
 
     def update(stadium: Stadium): Future[Try[Stadium]]
 

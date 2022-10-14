@@ -14,12 +14,12 @@ class MongoTestContainersSpec extends PlaySpec with ForAllTestContainer {
   "MongoDBTeamService" must {
 
     "createATeamDocument" in {
-      val mongoClient: MongoClient = MongoClient("mongodb://localhost:" + 27017)
+      val mongoClient: MongoClient = MongoClient(container.container.getConnectionString)
       val myCompanyDatabase = mongoClient.getDatabase("my_company")
       val employeeCollection = myCompanyDatabase.getCollection("employees")
 
       val document =
-        Document("_id" -> 30, "firstName" -> "Roy", "lastName" -> "Smith")
+        Document("_id" -> 40, "firstName" -> "Roy", "lastName" -> "Smith")
 
       employeeCollection
           .insertOne(document)
