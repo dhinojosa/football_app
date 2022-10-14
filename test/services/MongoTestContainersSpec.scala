@@ -33,5 +33,6 @@ class MongoTestContainersSpec extends PlaySpec with ForAllTestContainer {
       val result = 30
       result mustBe (30)
     }
+
   }
 }

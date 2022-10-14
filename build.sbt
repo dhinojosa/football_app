@@ -9,7 +9,7 @@ scalaVersion := "2.13.10"
 
 libraryDependencies ++= Seq(
   guice,
-  "com.dimafeng" %% "testcontainers-scala-scalatest" % testContainersScalaVersion % "test",
+  "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.11" % "test",
   "com.dimafeng" %% "testcontainers-scala-mongodb" % testContainersScalaVersion % "test",
   "org.mongodb.scala" %% "mongo-scala-driver" % "4.6.0",
   "org.webjars.npm" % "bootstrap" % "5.2.2",

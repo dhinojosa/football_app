@@ -2,18 +2,19 @@ package services
 
 import models.Stadium
 import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.{Document, MongoClient}
+import org.mongodb.scala.{Document, MongoClient, MongoCollection}
 
+import javax.inject.Inject
 import scala.concurrent.Future
 import scala.util.Try
 
-class MongoStadiumService extends AsyncStadiumService {
-
-  val mongoClient: MongoClient = MongoClient(
-    "mongodb://mongo-root:mongo-password@localhost:" + 27017
-  )
-  val myCompanyDatabase = mongoClient.getDatabase("football_app")
-  val stadiumCollection = myCompanyDatabase.getCollection("stadiums")
+/**
+ * In this latest change I am injecting the collection rather creating it inside
+ * of this particular service. Check the previous commit to see the difference
+ *
+ * @param stadiumCollection the MongoCollection that is established in Module
+ */
+class MongoStadiumService @Inject() (stadiumCollection:MongoCollection[Document]) extends AsyncStadiumService {
 
   override def findById(id: Long): Future[Option[Stadium]] = {
     stadiumCollection
