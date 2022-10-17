@@ -1,10 +1,12 @@
 import com.google.inject.{AbstractModule, Provides}
-import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
+import org.mongodb.scala.{MongoClient, MongoDatabase}
 import play.api.Configuration
 import services.{AsyncStadiumService, MemoryStadiumService, MongoStadiumService, StadiumService}
 
-import javax.inject.Named
-
+/**
+ * Preferred cleaned module. Different from before. But is workable and
+ * injectable in all different services
+ */
 class Module extends AbstractModule {
   override def configure(): Unit = {
 
@@ -17,24 +19,6 @@ class Module extends AbstractModule {
         s"mongodb://$username:$password@localhost:" + 27017
       )
       mongoClient.getDatabase(database)
-    }
-
-    @Provides
-    @Named("stadiumCollection")
-    def stadiumCollectionProvider(mongoDatabase: MongoDatabase): MongoCollection[Document] = {
-      mongoDatabase.getCollection("stadiums")
-    }
-
-    @Provides
-    @Named("playerCollection")
-    def playerCollectionProvider(mongoDatabase: MongoDatabase)   = {
-      mongoDatabase.getCollection("player")
-    }
-
-    @Provides
-    @Named("teamCollection")
-    def teamCollectionProvider(mongoDatabase: MongoDatabase): MongoCollection[Document] = {
-      mongoDatabase.getCollection("teams")
     }
 
     bind(classOf[StadiumService]).to(classOf[MemoryStadiumService])

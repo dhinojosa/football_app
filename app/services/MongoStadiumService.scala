@@ -2,36 +2,36 @@ package services
 
 import models.Stadium
 import org.mongodb.scala.model.Filters.equal
-import org.mongodb.scala.{Document, MongoClient, MongoCollection}
+import org.mongodb.scala.{Document, MongoDatabase}
 
 import javax.inject.Inject
 import scala.concurrent.Future
 import scala.util.Try
 
-/** In this latest change I am injecting the collection rather creating it inside
-  * of this particular service. Check the previous commit to see the difference
+/** In this latest change I am injecting the database rather creating it inside
+  * of this particular service. This was a tradeoff to get this to work.
+  * Check the previous commit to see the difference
   *
-  * @param stadiumCollection the MongoCollection that is established in Module
+  * @param mongoDatabase the MongoDatabase connection being used
   */
-class MongoStadiumService @Inject() (
-    stadiumCollection: MongoCollection[Document]
-) extends AsyncStadiumService {
+class MongoStadiumService @Inject() (mongoDatabase: MongoDatabase)
+    extends AsyncStadiumService {
 
-  override def findById(id: Long): Future[Option[Stadium]] = {
-    stadiumCollection
+  override def findById(id: Long): Future[Option[Stadium]] =
+    mongoDatabase
+      .getCollection("stadiums")
       .find(equal("_id", id))
-      .map { d =>
-        documentToStadium(d)
-      }
+      .map(documentToStadium)
       .toSingle()
       .headOption()
-  }
 
-  override def create(stadium: Stadium) =
-    stadiumCollection
+  override def create(stadium: Stadium) = {
+    mongoDatabase
+      .getCollection("stadiums")
       .insertOne(stadiumToDocument(stadium))
       .map(r => r.getInsertedId.asInt64().longValue())
       .head()
+  }
 
   private def stadiumToDocument(stadium: Stadium) = {
     Document(
@@ -45,11 +45,13 @@ class MongoStadiumService @Inject() (
 
   override def update(stadium: Stadium): Future[Try[Stadium]] = ???
 
-  override def findAll(): Future[List[Stadium]] = stadiumCollection
-    .find()
-    .map(documentToStadium)
-    .foldLeft(List.empty[Stadium])((list, stadium) => stadium :: list)
-    .head()
+  override def findAll(): Future[List[Stadium]] =
+    mongoDatabase
+      .getCollection("stadiums")
+      .find()
+      .map(documentToStadium)
+      .foldLeft(List.empty[Stadium])((list, stadium) => stadium :: list)
+      .head()
 
   private def documentToStadium(d: Document) = {
     Stadium(
