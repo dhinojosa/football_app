@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: football-configmap
+    name: football-app-configmap
 data:
-  mongo_host: mongodb
-  mongo_port: 27017
+    mongo_host: "mongodb"
+    mongo_port: "27017"
