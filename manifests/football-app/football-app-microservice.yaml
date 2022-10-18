@@ -34,7 +34,8 @@ spec:
                         backend:
                             service:
                                 name: mild-temper-microservice-service
-                                port: 30201
+                                port:
+                                  number: 30201
 ---
 apiVersion: v1
 kind: ConfigMap
