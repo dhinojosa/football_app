@@ -52,12 +52,11 @@ class StadiumController @Inject() (
           stadiumData.country
         )
         println("Yay!" + newStadium)
-        stadiumService.create(newStadium).map(v => Redirect(routes.StadiumController.show(id)))
+        stadiumService.create(newStadium)
+            .map(v => Redirect(routes.StadiumController.show(id)).flashing("success" -> "New Stadium has been added"))
       }
     )
   }
-
-
 
   def show(id: Long): Action[AnyContent] = Action.async { implicit request =>
     stadiumService
