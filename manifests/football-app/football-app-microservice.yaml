@@ -73,7 +73,7 @@ spec:
                     name: mild-temper-microservice
                     ports:
                         -   name: web
-                            containerPort: 8080
+                            containerPort: 9000
                     env:
                         -   name: MONGO_HOST
                             valueFrom:
