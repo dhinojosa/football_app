@@ -1,5 +1,8 @@
 package models
 
-class Position {
-  def foo(x: Int): Int = x
+
+sealed trait Position
+
+case object StrongForward extends Position {
+    override def toString: String = "Strong Forward"
 }
