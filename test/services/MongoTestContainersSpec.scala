@@ -29,7 +29,16 @@ class MongoTestContainersSpec extends PlaySpec with ForAllTestContainer {
 
       println("Showing all documents in employees")
       employeeCollection.find().subscribe(d => println(d))
-      Thread.sleep(20000)
+
+      employeeCollection.insertOne(document)
+          .flatMap(r => employeeCollection.find().toSingle().map(e => (r, e)))
+
+      for {
+        r <- employeeCollection.insertOne(document).toSingle()
+        e <- employeeCollection.find().collect
+      } yield (r, e)
+
+
       val result = 30
       result mustBe (30)
     }
