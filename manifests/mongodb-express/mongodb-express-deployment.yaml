@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mongodb-express
-          image: mongo-express
+          image: mongo-express:latest
           ports:
             - containerPort: 8081
           env:
@@ -30,14 +30,13 @@ spec:
             - name: ME_CONFIG_MONGODB_SERVER
               valueFrom:
                 configMapKeyRef:
-                  name: mongodb-configmap
+                  name: mongodb-express-configmap
                   key: database_url
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongodb-express-service
-  namespace: mongodb-namespace
 spec:
   selector:
     app: mongodb-express

@@ -1,7 +1,7 @@
 name := """football_app"""
 organization := "com.xyzcorp"
 
-version := "1.0-SNAPSHOT"
+version := sys.env.getOrElse("BUILD_ID", "0.1")
 val testContainersScalaVersion = "0.40.11"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -29,6 +29,8 @@ dockerChmodType := DockerChmodType.UserGroupWriteExecute
 dockerExposedPorts ++= Seq(9000, 9001)
 
 dockerBaseImage := "eclipse-temurin:11"
+
+Docker/packageName := sys.env.getOrElse("JOB_NAME", "football-app")
 
 Universal/javaOptions ++= Seq(
     // JVM memory tuning
