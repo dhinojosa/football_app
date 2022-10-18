@@ -37,15 +37,6 @@ spec:
                                 port:
                                   number: 30201
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-    name: football-configmap
-    namespace: default
-data:
-    database_url: mongodb
-
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
