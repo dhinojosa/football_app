@@ -14,7 +14,7 @@ spec:
         -   name: web
             protocol: TCP
             port: 30201
-            targetPort: 8080
+            targetPort: 9000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
