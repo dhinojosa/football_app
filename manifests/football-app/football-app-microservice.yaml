@@ -21,6 +21,8 @@ kind: Ingress
 metadata:
     labels:
         stack: frontend
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /mild-temper/$2
     name: mild-temper-ingress
     namespace: default
 spec:
