@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'sbt clean test Docker/publishLocal'
+                sh 'sbt -no-colors clean test Docker/publishLocal'
             }
         }
         stage('Write properties') {

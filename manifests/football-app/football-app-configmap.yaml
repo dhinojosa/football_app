@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: football-configmap
 data:
-  database_url: mongodb
+  mongo_host: mongodb
+  mongo_port: 27017
