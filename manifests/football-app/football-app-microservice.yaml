@@ -1,0 +1,89 @@
+kind: Service
+apiVersion: v1
+metadata:
+    labels:
+        app: mild-temper-microservice-service
+        stack: frontend
+    name: mild-temper-microservice-service
+spec:
+    selector:
+        source: demo
+        app: mild-temper-microservice
+    ports:
+        -   name: web
+            protocol: TCP
+            port: 30201
+            targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+    labels:
+        stack: frontend
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+    name: mild-temper-ingress
+spec:
+    rules:
+        -   http:
+                paths:
+                    -   path: /mild-temper(/|$)(.*)
+                        backend:
+                            serviceName: mild-temper-microservice-service
+                            servicePort: 30201
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: football-configmap
+data:
+    database_url: mongodb
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+    labels:
+        app: mild-temper-microservice
+        stack: frontend
+        source: demo
+    name: mild-temper-microservice
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            run: mild-temper-microservice
+    template:
+        metadata:
+            labels:
+                app: mild-temper-microservice
+                run: mild-temper-microservice
+                source: demo
+        spec:
+            containers:
+                -   image: 219099013464.dkr.ecr.us-west-2.amazonaws.com/mild-temper-microservice
+                    name: mild-temper-microservice
+                    ports:
+                        -   name: web
+                            containerPort: 8080
+                    env:
+                        -   name: MONGO_HOST
+                            valueFrom:
+                                configMapKeyRef:
+                                    name: football-configmap
+                                    key: mongo_host
+                        -   name: MONGO_PORT
+                            valueFrom:
+                                configMapKeyRef:
+                                    name: football-configmap
+                                    key: mongo_port
+                        -   name: MONGO_USERNAME
+                            value: root
+                        -   name: MONGO_PASSWORD
+                            valueFrom:
+                                secretKeyRef:
+                                    name: mongodb
+                                    key: mongodb-root-password
+                        -   name: DATABASE_NAME
+                            value: mild-temper-football-app
+
