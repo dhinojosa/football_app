@@ -1,4 +1,6 @@
-@(stadium: Stadium)
+@(stadium: Stadium)(implicit flash:Flash)
+
+@flash.get("success").getOrElse("Here is the stadium")
 
 @main("View Stadium") {
     Stadium: @stadium.name

@@ -1,13 +1,21 @@
 @(stadiumForm: Form[StadiumData])(implicit request: RequestHeader, messagesProvider: MessagesProvider)
-@import views.html.helper.CSRF
+    @import views.html.helper.CSRF
 
-@main("Create Stadium") {
-    @helper.form(action = routes.StadiumController.create()) {
-        @CSRF.formField
-        @helper.inputText(stadiumForm("name"))
-        @helper.inputText(stadiumForm("city"))
-        @helper.inputText(stadiumForm("country"))
-        @helper.inputText(stadiumForm("seats"))
-        <input type="submit" id="submit" value="Submit"/>
+    @if(stadiumForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- stadiumForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-}
+
+    @main("Create Stadium") {
+        @helper.form(action = routes.StadiumController.create()) {
+            @CSRF.formField
+            @helper.inputText(stadiumForm("name"))
+            @helper.inputText(stadiumForm("city"))
+            @helper.inputText(stadiumForm("country"))
+            @helper.inputText(stadiumForm("seats"))
+            <input type="submit" id="submit" value="Submit"/>
+        }
+    }
