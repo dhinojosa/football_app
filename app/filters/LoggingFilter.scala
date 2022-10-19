@@ -7,7 +7,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class LoggingFilter @Inject() (implicit val mat: Materializer, ec: ExecutionContext) extends Filter with Logging {
+class LoggingFilter @Inject()(implicit val mat: Materializer, ec: ExecutionContext) extends Filter with Logging {
     def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
         val startTime = System.currentTimeMillis
 
