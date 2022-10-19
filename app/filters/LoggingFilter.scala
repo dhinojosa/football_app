@@ -1,3 +1,5 @@
+package filters
+
 import javax.inject.Inject
 import akka.stream.Materializer
 import play.api.Logging
