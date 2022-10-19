@@ -32,6 +32,8 @@ spec:
                 configMapKeyRef:
                   name: mongodb-express-configmap
                   key: database_url
+            - name: ME_CONFIG_SITE_BASEURL
+              value: '/mongodb/'
 ---
 apiVersion: v1
 kind: Service
