@@ -23,13 +23,35 @@ metadata:
         stack: frontend
     annotations:
         nginx.ingress.kubernetes.io/rewrite-target: /mild-temper/$2
-    name: mild-temper-ingress
+    name: mild-temper-ingress-path
     namespace: default
 spec:
     rules:
-        -   http:
+        - http:
+              paths:
+                  -   path: /mild-temper(/|$)(.*)
+                      pathType: Prefix
+                      backend:
+                          service:
+                              name: mild-temper-microservice-service
+                              port:
+                                  number: 30201
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    labels:
+        stack: frontend
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /mild-temper
+    name: mild-temper-ingress-root
+    namespace: default
+spec:
+    rules:
+        - host: mild-temper.tiered-planet.net
+          http:
                 paths:
-                    -   path: /mild-temper(/|$)(.*)
+                    -   path: /mild-temper
                         pathType: Prefix
                         backend:
                             service:
