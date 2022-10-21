@@ -2,24 +2,26 @@ package services
 
 import com.dimafeng.testcontainers.{ForAllTestContainer, MongoDBContainer}
 import models.{Stadium, Team}
-import org.mongodb.scala.model.Aggregates
-import org.mongodb.scala.result.InsertOneResult
 import org.mongodb.scala.{Document, MongoClient}
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-import java.util
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
+object MongoPlayerServiceContainersSpec {}
+
 class MongoPlayerServiceContainersSpec
     extends PlaySpec
-    with ForAllTestContainer {
+    with ForAllTestContainer
+    with ScalaCheckPropertyChecks { //Include ScalaCheckPropertyChecks is included so that we can perform property testing
 
   @Override
   val container: MongoDBContainer = new MongoDBContainer()
 
   "MongoDBTeamService" must {
-    "be able to an aggregate and put into a temporary variable" in {
+    "findById and include a stadium" in {
       val mongoClient: MongoClient =
         MongoClient(container.container.getConnectionString)
       val mongoDatabase = mongoClient.getDatabase("my_company")
@@ -36,55 +38,85 @@ class MongoPlayerServiceContainersSpec
         "stadium" -> stadium.id
       )
 
-      val response = teamCollection.insertOne(document)
-      response
+      val teamService = MongoTeamService(mongoDatabase)
+
+      val getId = teamCollection
+        .insertOne(document)
         .head()
-        .foreach(id => {
-          id mustNot be(null)
-        })
 
-      case class TeamStadiumView(
-          teamId: Long,
-          teamName: String,
-          stadiumName: String,
-          stadiumId: Long
-      )
+      val eventualMaybeTeam =
+        getId
+          .map(r => r.getInsertedId.asInt64().longValue())
+          .flatMap(id => teamService.findById(id))
 
-      val aggregated = teamCollection.aggregate(
-        Seq(
-          Aggregates
-            .lookup("stadiums", "stadium", "_id", "stadiumArray")
-        )
-      )
-
-      val eventualMaybeView = aggregated
-        .map(d => {
-          TeamStadiumView(
-            d.getLong("_id"),
-            d.getString("name"),
-            getFromMongoList(d).asInstanceOf[String],
-            d.getLong("stadium")
-          )
-        })
-        .toSingle()
-        .headOption()
       import scala.concurrent.duration._
-      val await = Await.result(eventualMaybeView, 3.seconds)
-      println(await)
+
+      val await: Option[Team] = Await.result(eventualMaybeTeam, 3.seconds)
+      await must contain(team)
     }
-  }
 
-  private def getFromMongoList(d: Document) = {
-    import scala.jdk.CollectionConverters._
-    d
-      .getList("stadiumArray", classOf[util.Map[_, _]])
-      .asScala
-      .head
-      .get("name")
-  }
+    "Create a stadium" in {
+      val genStadium: Gen[Stadium] = for {
+        id <- Gen.posNum[Int]
+        name <- Gen.alphaStr.suchThat(_.nonEmpty)
+        seats <- Gen.choose(3, 20000)
+        city <- Gen.alphaStr.suchThat(_.nonEmpty)
+        country <- Gen.alphaStr.suchThat(_.nonEmpty)
+      } yield (Stadium(id, name, seats, city, country))
 
-  private def extractFromResult(r: InsertOneResult) = {
-    org.mongodb.scala.model.Filters
-      .equal("_id", r.getInsertedId.asInt64().longValue())
+
+      forAll(genStadium)((s:Stadium) => {
+        println(s)
+
+      })
+    }
+
+    "findAll and include a stadium" in {
+
+      val mongoClient: MongoClient =
+        MongoClient(container.container.getConnectionString)
+      val mongoDatabase = mongoClient.getDatabase("my_company")
+
+      val genStadium = for {
+        id <- Gen.posNum[Int]
+        name <- Gen.alphaStr.suchThat(_.nonEmpty)
+        seats <- Gen.choose(3, 20000)
+        city <- Gen.alphaStr.suchThat(_.nonEmpty)
+        country <- Gen.alphaStr.suchThat(_.nonEmpty)
+      } yield (Stadium(id, name, seats, city, country))
+
+      val stadiumService = new MongoStadiumService(mongoDatabase)
+      val teamService = MongoTeamService(mongoDatabase)
+
+      implicit val arbitraryStadium: Arbitrary[Stadium] =
+        Arbitrary[Stadium](genStadium)
+
+      forAll(Gen.nonEmptyListOf(genStadium))((s: List[Stadium]) => {
+        whenever(s.nonEmpty) {
+          println(s)
+          s.foreach(stadiumService.create)
+          val genTeam: Gen[Team] = for {
+            id <- Gen.posNum[Int]
+            name <- Gen.alphaStr
+            stadium <- Gen.oneOf(s)
+          } yield (Team(id, name, stadium))
+
+          implicit val arbitraryTeam: Arbitrary[Team] =
+            Arbitrary[Team](genTeam)
+
+          forAll((t: List[Team]) => {
+            whenever(t.nonEmpty) {
+              println(t)
+              t.foreach(teamService.create)
+              teamService
+                .findAll()
+                .map(result => result.size)
+                .foreach(s => s mustBe (t.size))
+              teamService.deleteAll()
+            }
+          })
+        }
+      })
+    }
   }
 }
